@@ -48,7 +48,7 @@ plt.show()
 
 # 🖼️ Show some predictions
 emotion_map = pd.read_csv(f"{base_path}\\label_map.csv")
-emotion_dict = dict(zip(emotion_map["Encoded"], emotion_map["Label"]))
+emotion_dict = dict(zip(emotion_map["encoded"], emotion_map["label"]))
 
 plt.figure(figsize=(10,5))
 for i in range(10):

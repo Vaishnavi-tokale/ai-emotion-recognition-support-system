@@ -5,6 +5,8 @@ from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_class_weight
+from tensorflow.keras.optimizers import Adam
 
 # ------------------------------
 # 📂 PATH CONFIGURATION
@@ -35,18 +37,24 @@ print(f"✅ Data split complete! Train: {X_train.shape}, Test: {X_test.shape}")
 print("🔧 Building VGG19-based CNN model...")
 
 base_model = VGG19(weights='imagenet', include_top=False, input_shape=(48, 48, 3))
-for layer in base_model.layers:
-    layer.trainable = False  # freeze pretrained layers
+# Freeze all layers except the last 8 layers
+for layer in base_model.layers[:-8]:
+    layer.trainable = False
+for layer in base_model.layers[-8:]:
+    layer.trainable = True
 
 model = models.Sequential([
     base_model,
-    layers.Flatten(),
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(512, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dropout(0.5),
     layers.Dense(256, activation='relu'),
     layers.Dropout(0.4),
     layers.Dense(num_classes, activation='softmax')
 ])
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 
 # ------------------------------
@@ -64,12 +72,22 @@ callbacks = [
 # ------------------------------
 print("🚀 Training started...")
 
+# Calculate class weights dynamically
+y_train_integers = np.argmax(y_train, axis=1)
+class_weights = compute_class_weight(
+    class_weight='balanced',
+    classes=np.unique(y_train_integers),
+    y=y_train_integers
+)
+class_weight_dict = dict(zip(np.unique(y_train_integers), class_weights))
+
 history = model.fit(
     X_train, y_train,
     validation_split=0.15,
-    epochs=25,
+    epochs=35,
     batch_size=32,
     callbacks=callbacks,
+    class_weight=class_weight_dict,
     verbose=1
 )
 

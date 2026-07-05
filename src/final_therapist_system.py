@@ -19,8 +19,6 @@ sign_model = load_model("sign_lstm_model.h5")
 with open("label_map.pkl", "rb") as f:
     label_map = pickle.load(f)
 
-label_map = {v: k for k, v in label_map.items()}
-
 # =========================
 # FACE DETECTOR
 # =========================
