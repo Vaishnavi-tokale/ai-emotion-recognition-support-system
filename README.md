@@ -1,4 +1,4 @@
-# 🧠 AI-Based Emotion Recognition and Supportive Response System
+# 🧠EmotiVoice – AI-Assisted Emotional Support for Non-Verbal Individuals
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)
